@@ -1,6 +1,8 @@
 package com.monkey.springboot.demo.advice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.monkey.springboot.demo.annotation.AesSecurityParameter;
+import com.monkey.springboot.demo.annotation.RsaSecurityParameter;
 import com.monkey.springboot.demo.annotation.SecurityParameter;
 import com.monkey.springboot.demo.utils.AesEncryptUtils;
 import com.monkey.springboot.demo.utils.RSAUtils;
@@ -30,7 +32,9 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
 
     @Value("${client.public.key}")
     private String CLIENT_PUBLIC_KEY;
-    //private static final String CLIENT_PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9ikrLxa/cgLZXQugBQFhdxCPQmEZ9j9hadra81MqAxmRkc3eFwROAHk/+39fhmDwgtjE/w4cO6XDabL/mi5V37ioByS1QpovF8ZlJgz/RjvV3TEanvxluridXlNTfOd45uC9+TmR2DzRk5p25U1F74wF7K2KSGv2gyqZvttxrfwIDAQAB";
+
+    @Value("${aes.private.key}")
+    private String AES_PRIVATE_KEY;
 
     @Override
     public boolean supports(MethodParameter methodParameter, Class aClass) {
@@ -39,35 +43,107 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter methodParameter, MediaType mediaType, Class aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
-        boolean encode = false;
+        if (methodParameter.getMethod().isAnnotationPresent(AesSecurityParameter.class)) {
+            //获取注解配置的包含和去除字段
+            AesSecurityParameter serializedField = methodParameter.getMethodAnnotation(AesSecurityParameter.class);
+            //出参是否需要加密
+            if (serializedField.outEncode()){
+                logger.info("对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行加密");
+                return encodeAes(methodParameter,body);
+            }
+        }
+        if (methodParameter.getMethod().isAnnotationPresent(RsaSecurityParameter.class)) {
+            //获取注解配置的包含和去除字段
+            RsaSecurityParameter serializedField = methodParameter.getMethodAnnotation(RsaSecurityParameter.class);
+            //出参是否需要加密
+            if (serializedField.outEncode()){
+                logger.info("对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行加密");
+                return encodeRsa(methodParameter,body);
+            }
+        }
         if (methodParameter.getMethod().isAnnotationPresent(SecurityParameter.class)) {
             //获取注解配置的包含和去除字段
             SecurityParameter serializedField = methodParameter.getMethodAnnotation(SecurityParameter.class);
             //出参是否需要加密
-            encode = serializedField.outEncode();
-        }
-        if (encode) {
-            logger.info("对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行加密");
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                String result = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(body);
-                // 生成aes秘钥
-                String aseKey = getRandomString(16);
-                // rsa加密
-                String encrypted = RSAUtils.encryptedDataOnJava(aseKey, CLIENT_PUBLIC_KEY);
-                // aes加密
-                String requestData = AesEncryptUtils.encrypt(result, aseKey);
-                Map<String, String> map = new HashMap<>();
-                map.put("encrypted", encrypted);
-                map.put("requestData", requestData);
-                return map;
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error("对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行解密出现异常：" + e.getMessage());
+            if (serializedField.outEncode()){
+                logger.info("对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行加密");
+                return encodeAesRsa(methodParameter,body);
             }
         }
         return body;
     }
+
+
+    /**
+     * AES加密
+     * @param methodParameter
+     * @param body
+     * @return
+     */
+    private Object encodeAes(MethodParameter methodParameter,Object body){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String result = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(body);
+            // aes加密
+            String requestData = AesEncryptUtils.encrypt(result, AES_PRIVATE_KEY);
+            Map<String, String> map = new HashMap<>();
+            map.put("requestData", requestData);
+            return map;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行解密出现异常：" + e.getMessage());
+        }
+        return body;
+    }
+
+    /**
+     * RSA加密
+     * @param methodParameter
+     * @param body
+     * @return
+     */
+    private Object encodeRsa(MethodParameter methodParameter,Object body){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String result = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(body);
+            // rsa加密
+            String requestData = RSAUtils.encryptedDataOnJava(result, CLIENT_PUBLIC_KEY);
+            Map<String, String> map = new HashMap<>();
+            map.put("requestData", requestData);
+            return map;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行解密出现异常：" + e.getMessage());
+        }
+        return body;
+    }
+
+    /**
+     * 混合加密
+     * @return
+     */
+    private Object encodeAesRsa(MethodParameter methodParameter,Object body){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String result = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(body);
+            // 生成aes秘钥
+            String aseKey = getRandomString(16);
+            // rsa加密
+            String encrypted = RSAUtils.encryptedDataOnJava(aseKey, CLIENT_PUBLIC_KEY);
+            // aes加密
+            String requestData = AesEncryptUtils.encrypt(result, aseKey);
+            Map<String, String> map = new HashMap<>();
+            map.put("encrypted", encrypted);
+            map.put("requestData", requestData);
+            return map;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("对方法method :【" + methodParameter.getMethod().getName() + "】返回数据进行解密出现异常：" + e.getMessage());
+        }
+        return body;
+    }
+
+
 
     /**
      * 创建指定位数的随机字符串
@@ -85,4 +161,7 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice {
         return sb.toString();
     }
 
+    public static void main(String[] args) {
+        System.out.println(getRandomString(16));
+    }
 }

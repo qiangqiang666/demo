@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>recaptcha+rsa+aes联合使用</title>
+    <script src="https://www.recaptcha.net/recaptcha/api.js" async defer></script>
+    <script type="text/javascript" th:src="@{~/js/jquery-2.2.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/jsencrypt.min.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/aes.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/pad-zeropadding.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/security.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/random.js}"></script>
+    <script>
+        function onSubmit(token) {
+            //document.getElementById("demo-form").submit();
+            // 获取16位随机数,当做aes秘钥key
+            var randomStr = randomString(16);
+            // aes加密
+            var data = Encrypt(JSON.stringify({name:$("#name").val(),password:$("#password").val(),code:token}),randomStr);
+            // rsa加密
+            var encrypt = new JSEncrypt();
+            encrypt.setPublicKey($("#servicePublicKey").val());
+            var encrypted = encrypt.encrypt(randomStr);
+            // 创建json对象
+            var json = {
+                "requestData": data,
+                "encrypted": encrypted
+            };
+            $.ajax({
+                type: "POST",
+                url:"/check",
+                data: JSON.stringify(json),
+                dataType:'json',
+                contentType: "application/json",
+                success: function(result) {
+                    alert("返回的数据对象:"+result);
+                    // rsa解密,获取到aes秘钥
+                    var decrypt = new JSEncrypt();
+                    decrypt.setPrivateKey($('#clientPrivateKey').val());
+                    var aesKey = decrypt.decrypt(result.encrypted);
+                    // 用aes秘钥进行解密
+                    var resultData = Decrypt(result.requestData,aesKey);
+                    alert("解密的数据：" + resultData);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<form  method="POST">
+    <input type="test" name="name" id="name">
+    <input type="test" name="password" id="password">
+    <!-- data-sitekey 需要填写公钥 -->
+    <button class="g-recaptcha" data-sitekey="6Lc7qXcUAAAAABYnZ_uM6xWOu5b7GvHeUYc_tgqr" data-callback='onSubmit'>Submit</button>
+    <br/>
+</form>
+<h2>服务端公钥：</h2>
+<textarea id="servicePublicKey" rows="5" cols="45">MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCfXfMzgg4m5RRLg2vcrYBFN4sBhE1VtW1sBkXxC5wtCRaOZv0kudk9CIQfU6c+eEaaZKUnygxHWdSqdwURCE0IKgLcolXF+RHmu/rl977FfjRg9pAkBg5z05PfHDqWqkIsqX0iRaSP31BUZOgtwafbiBv2dBvRBMdq03ty4q8OQQIDAQAB
+</textarea>
+<h2>客户端私钥：</h2>
+<textarea id="clientPrivateKey" rows="5" cols="45">MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAITfvlC8+Nr+vz3DnhuCWW41ax8PG+rCiXt/f4XjRMlj9ZC2AuMMbtHLsTMLhCrhgHt1MxdcoYtqvQfxu4AVOh6pZrxMr2AiyNpw8SecmM3m0YWYNc7tnUB6/vlLyQduikD4qaxNiB5FcUiRpiRoLpz7rT6UV+/zDh+ibgvZRLDRAgMBAAECgYB7/mMV6tJ7YkBKPdK8Lw6PZq/5Att1XmZ3ZYo2Adg96tbMXN0izYZYprFMRhHnBhokm0C7K0jg1hFiaXUkWCqr83H+Y+DZ7js9NDhApPYAELQDIu288/nz34mjU/wnIGWP6WK5PCd1QjR8ltFay1TDLecdavHHjWGfHOMYnY5/dQJBAOZ4ICB+VrXMwR8KUR3r420YAHPwQDQKDetMHwgYHtFUH/k3CtKzPrltx103OhQcKyfrkoPj8SREZZISaBEQL6cCQQCTl+pjOSMud4hFTvfTnkGx9EZT3dBAv31ZfzHCu4g41FxRLyJLY6iKce069IhMjC2gfoLtwDLM/dKzRAuw9+rHAkAd9/zlfMg1t7xdFvBZXbUjGH3mlZUjrzMEJ8/ZM5m+SpwlwfyMTXaYkifcfTP2LXuHI2DX+an/t00l43LY1Sv9AkAEgQ5WGNhKArvV4aMOgjXfCGVdCdfhIfbhVFBgcPinQ1PN5nJVeqUaFH/43J2MOHrr+vBj8Qmb1+MmNV1l+SrhAkArJjCosjMI32RT3GmC6+gwxADR9Ib53yDHwRoMeO34dgK3hj3+e66Jhpcht3AjXBVs7bF9xzXcePpxxCka9cEv</textarea>
+</body>
+</html>

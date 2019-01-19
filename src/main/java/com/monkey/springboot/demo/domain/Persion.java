@@ -23,8 +23,7 @@ import org.omg.CORBA.PRIVATE_MEMBER;
  * @create 2018/10/24
  * @since 1.0.0
  */
-@Getter
-@Setter
+@Data
 public class Persion {
     private String name;
     private String password;

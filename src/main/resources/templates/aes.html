@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <script type="text/javascript" th:src="@{~/js/aes.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/pad-zeropadding.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/security.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/jquery-2.2.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/random.js}"></script>
+</head>
+<body>
+<!--<span th:text="${hello}"></span>-->
+<button id="select" onclick="sendData()">触发</button>
+</body>
+<script>
+    function sendData() {
+        // aes秘钥
+        var privateKey="abcdef0123456789";
+        // aes加密
+        var data = Encrypt(JSON.stringify({name:"qiangqiang"}),privateKey);
+        // 创建json对象
+        var json = {
+            "requestData": data
+        };
+        $.ajax({
+            type: "POST",
+            url:"/testAesEncrypt",
+            data:JSON.stringify(json),
+            dataType:'json',
+            contentType: "application/json",
+            success: function(result) {
+                var data = Decrypt(result.requestData,privateKey);
+                alert("返回的数据："+data);
+            }
+        });
+    }
+</script>
+</html>

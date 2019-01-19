@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>recaptcha V2使用</title>
+    <script src="https://www.recaptcha.net/recaptcha/api.js" async defer></script>
+    <script type="text/javascript" th:src="@{~/js/jquery-2.2.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/jsencrypt.min.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/aes.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/pad-zeropadding.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/security.js}"></script>
+    <script type="text/javascript" th:src="@{~/js/random.js}"></script>
+    <script>
+        function onSubmit(token) {
+            $.ajax({
+                type: "POST",
+                url:"/checkV2",
+                data:{"token":token},
+                success: function(data) {
+                    alert("返回的数据："+data);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<form  method="POST">
+    <input type="test" name="name" id="name">
+    <input type="test" name="password" id="password">
+    <!-- data-sitekey 需要填写公钥 -->
+    <button class="g-recaptcha" data-sitekey="6Lc7qXcUAAAAABYnZ_uM6xWOu5b7GvHeUYc_tgqr" data-callback='onSubmit'>Submit</button>
+    <br/>
+</form>
+</body>
+</html>

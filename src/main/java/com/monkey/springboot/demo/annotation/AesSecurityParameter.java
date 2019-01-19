@@ -7,16 +7,14 @@ import java.lang.annotation.*;
 
 /**
  * @author monkey
- * @desc 请求混合数据解密
+ * @desc 请求Aes数据解密
  * @date 2018/10/25 20:17
  */
 @Target({ElementType.METHOD,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Mapping
 @Documented
-/*@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)*/
-public @interface SecurityParameter {
+public @interface AesSecurityParameter {
 
     /**
      * 入参是否解密，默认解密
