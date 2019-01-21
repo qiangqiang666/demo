@@ -4,7 +4,7 @@
 2.RSA加解密请求demo<br>
 3.recaptcha V2版本demo<br>
 4.recaptcha V3版本demo<br>
-## 访问4个页面,然后debug就可以查看如何实现以上4种技术点 ##
+## 运行后访问6个页面,然后debug就可以查看如何实现以上4种技术点 ##
 1.(aes加解密双向)http://localhost:8080/aes<br>
 2.(rsa加解密双向)http://localhost:8080/rsa<br>
 3.(混合加解密双向)http://localhost:8080/rsaAes<br>
