@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>recaptcha V3使用</title>
+    <script src='https://www.recaptcha.net/recaptcha/api.js?render=6LdBgIoUAAAAAJvGiPWe9wqfYFDi7ArZbZFoMNYX'></script>
+    <script type="text/javascript" th:src="@{~/js/jquery-2.2.3.min.js}"></script>
+    <script>
+        grecaptcha.ready(function() {
+            grecaptcha.execute('6LdBgIoUAAAAAJvGiPWe9wqfYFDi7ArZbZFoMNYX', {action: 'login'})
+                .then(function(token) {
+                    // Verify the token on the server.
+                    $.ajax({
+                        type: "POST",
+                        url:"/checkV3",
+                        data:{"token":token},
+                        success: function(data) {
+                            alert("返回的数据："+data);
+                        }
+                    });
+                });
+        });
+    </script>
+
+</head>
+<body>
+</body>
+</html>

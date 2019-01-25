@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.monkey.springboot.demo.HttpRequest;
 import com.monkey.springboot.demo.annotation.AesSecurityParameter;
+import com.monkey.springboot.demo.annotation.MyLog;
 import com.monkey.springboot.demo.annotation.RsaSecurityParameter;
 import com.monkey.springboot.demo.annotation.SecurityParameter;
 import com.monkey.springboot.demo.domain.Persion;
@@ -106,6 +107,7 @@ return "aes";
      * @param persion
      * @return
      */
+    @MyLog(value = "综合测试记录")
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     @SecurityParameter
     @ResponseBody
@@ -144,6 +146,8 @@ return "aes";
             throw new RuntimeException("参数【g-recaptcha-response】验证过程中异常！");
         }
     }
+
+    @MyLog(value = "谷歌recaptchaV2验证记录")
     @RequestMapping("/checkV2")
     @ResponseBody
     public String checkV2(String token) {
@@ -155,6 +159,7 @@ return "aes";
         return json;
     }
 
+    @MyLog(value = "谷歌recaptchaV3验证记录")
     @RequestMapping("/checkV3")
     @ResponseBody
     public String checkV3(String token) {
