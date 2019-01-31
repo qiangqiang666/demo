@@ -18,6 +18,7 @@ import com.monkey.springboot.demo.annotation.MyLog;
 import com.monkey.springboot.demo.annotation.RsaSecurityParameter;
 import com.monkey.springboot.demo.annotation.SecurityParameter;
 import com.monkey.springboot.demo.domain.Persion;
+import com.monkey.springboot.demo.utils.BadWordUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 〈一句话功能简述〉<br>
@@ -170,5 +172,15 @@ return "aes";
         String json = HttpRequest.sendPost("https://www.recaptcha.net/recaptcha/api/siteverify", map, "UTF-8");
         return json;
     }
-
+    @MyLog(value = "敏感词验证记录")
+    @RequestMapping("/checkStr")
+    @ResponseBody
+    public String checkStr(String str) {
+        System.out.println("替换敏感词: "+BadWordUtil.replaceBadWord(str, 2, "*"));
+        System.out.println("是否包含敏感词: "+BadWordUtil.isContaintBadWord(str, 2));
+        Set<String> set = BadWordUtil.getBadWord(str, 2);
+        System.out.println("敏感词汇个数: "+set.size());
+        System.out.println("敏感词汇: "+BadWordUtil.getBadWord(str, 2));
+        return str;
+    }
 }
