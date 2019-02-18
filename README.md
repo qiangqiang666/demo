@@ -12,6 +12,6 @@
 3.(混合加解密双向)http://localhost:8080/rsaAes<br>
 4.(混合加解密双向+recaptchaV2验证)http://localhost:8080/summary<br>
 5.(V2)http://localhost:8080/recaptchaV2<br>
-6.(V3)http://localhost:8080/recaptchaV2<br>
+6.(V3)http://localhost:8080/recaptchaV3<br>
 7.测试日志记录,访问第5或6或4点的链接即可在控制台查看效果<br>
 8.(敏感词)http://localhost:8080/checkStr?str=Monkey大傻X
