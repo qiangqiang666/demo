@@ -19,9 +19,11 @@ import com.monkey.springboot.demo.annotation.RsaSecurityParameter;
 import com.monkey.springboot.demo.annotation.SecurityParameter;
 import com.monkey.springboot.demo.domain.Persion;
 import com.monkey.springboot.demo.utils.BadWordUtil;
+import com.monkey.springboot.demo.utils.SendEmailUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +42,9 @@ import java.util.Set;
 @Controller
 public class TestController {
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
+
+    @Autowired
+    private SendEmailUtils sendEmailUtils;
 
     // 跳转rsa页面
     @GetMapping("/rsa")
@@ -182,5 +187,12 @@ return "aes";
         System.out.println("敏感词汇个数: "+set.size());
         System.out.println("敏感词汇: "+BadWordUtil.getBadWord(str, 2));
         return str;
+    }
+
+    @MyLog(value = "发送邮件记录")
+    @GetMapping("/sendEmail")
+    @ResponseBody
+    public void sendEmail(String email) throws Exception {
+        sendEmailUtils.send(email);
     }
 }
