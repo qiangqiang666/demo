@@ -5,7 +5,13 @@
     <title>recaptcha V3使用</title>
     <script src='https://www.recaptcha.net/recaptcha/api.js?render=6LdBgIoUAAAAAJvGiPWe9wqfYFDi7ArZbZFoMNYX'></script>
     <script type="text/javascript" th:src="@{~/js/jquery-2.2.3.min.js}"></script>
+    <style type="text/css">
+        .grecaptcha-badge {
+            display: none;
+        }
+    </style>
     <script>
+        // 页面加载触发
         grecaptcha.ready(function() {
             grecaptcha.execute('6LdBgIoUAAAAAJvGiPWe9wqfYFDi7ArZbZFoMNYX', {action: 'login'})
                 .then(function(token) {
@@ -20,9 +26,25 @@
                     });
                 });
         });
+        //手动点击触发
+        function dianji(){
+            grecaptcha.execute('6LdBgIoUAAAAAJvGiPWe9wqfYFDi7ArZbZFoMNYX', {action: 'login'})
+                .then(function(token) {
+                    // Verify the token on the server.
+                    $.ajax({
+                        type: "POST",
+                        url:"/checkV3",
+                        data:{"token":token},
+                        success: function(data) {
+                            alert("返回的数据："+data);
+                        }
+                    });
+                });
+        }
     </script>
 
 </head>
 <body>
+<button onclick="dianji()">点击触发</button>
 </body>
 </html>

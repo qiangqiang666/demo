@@ -10,6 +10,11 @@
     <script type="text/javascript" th:src="@{~/js/pad-zeropadding.js}"></script>
     <script type="text/javascript" th:src="@{~/js/security.js}"></script>
     <script type="text/javascript" th:src="@{~/js/random.js}"></script>
+    <style type="text/css">
+        .grecaptcha-badge {
+            display: none;//隐藏图标
+        }
+    </style>
     <script>
         function onSubmit(token) {
             $.ajax({
@@ -28,7 +33,7 @@
     <input type="test" name="name" id="name">
     <input type="test" name="password" id="password">
     <!-- data-sitekey 需要填写公钥 -->
-    <button class="g-recaptcha" data-sitekey="6Lc7qXcUAAAAABYnZ_uM6xWOu5b7GvHeUYc_tgqr" data-callback='onSubmit'>Submit</button>
+    <button class="g-recaptcha" data-sitekey="6Lc7qXcUAAAAABYnZ_uM6xWOu5b7GvHeUYc_tgqr" data-callback='onSubmit' data-badge="inline">Submit</button>
     <br/>
 </form>
 </body>
