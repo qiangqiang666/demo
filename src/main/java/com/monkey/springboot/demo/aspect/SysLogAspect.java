@@ -11,6 +11,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -58,8 +59,16 @@ public class SysLogAspect {
  
         //请求的参数
         Object[] args = joinPoint.getArgs();
+        boolean flag = true;
+        for (Object arg:args ) {
+            // 忽略流文件
+            if (arg instanceof MultipartFile){
+                flag = false;
+            }
+        }
+
         //将参数所在的数组转换成json
-        String params = JSON.toJSONString(args);
+        String params = flag ? JSON.toJSONString(args) : "";
         sysLog.setParams(params);
  
         sysLog.setCreateDate(new Date());

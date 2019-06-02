@@ -11,7 +11,8 @@
         }
     </style>
     <script>
-/*        grecaptcha.ready(function() {
+        // 页面加载触发
+        grecaptcha.ready(function() {
             grecaptcha.execute('6LdBgIoUAAAAAJvGiPWe9wqfYFDi7ArZbZFoMNYX', {action: 'login'})
                 .then(function(token) {
                     // Verify the token on the server.
@@ -24,7 +25,8 @@
                         }
                     });
                 });
-        });*/
+        });
+        //手动点击触发
         function dianji(){
             grecaptcha.execute('6LdBgIoUAAAAAJvGiPWe9wqfYFDi7ArZbZFoMNYX', {action: 'login'})
                 .then(function(token) {
@@ -43,6 +45,6 @@
 
 </head>
 <body>
-<button onclick="dianji()">提交</button>
+<button onclick="dianji()">点击触发</button>
 </body>
 </html>

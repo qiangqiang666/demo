@@ -1,4 +1,4 @@
-package com.monkey.springboot.demo;
+package com.monkey.springboot.demo.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

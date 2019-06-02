@@ -17,14 +17,21 @@ public class RepeatedlyReadFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        ServletRequest requestWrapper = null;
-        if (request instanceof HttpServletRequest) {
-            requestWrapper = new RepeatedlyReadRequestWrapper((HttpServletRequest) request);
-        }
-        if (null == requestWrapper) {
+        HttpServletRequest serveltRequst = (HttpServletRequest) request;
+        String url = serveltRequst.getRequestURI();
+        // 不拦截url包含export的请求
+        if (url.contains("export")){
             chain.doFilter(request, response);
-        } else {
-            chain.doFilter(requestWrapper, response);
+        }else{
+            ServletRequest requestWrapper = null;
+            if (request instanceof HttpServletRequest) {
+                requestWrapper = new RepeatedlyReadRequestWrapper(serveltRequst);
+            }
+            if (null == requestWrapper) {
+                chain.doFilter(request, response);
+            } else {
+                chain.doFilter(requestWrapper, response);
+            }
         }
     }
 

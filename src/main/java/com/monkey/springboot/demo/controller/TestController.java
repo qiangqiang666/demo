@@ -12,24 +12,25 @@ package com.monkey.springboot.demo.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.monkey.springboot.demo.HttpRequest;
+import com.monkey.springboot.demo.utils.*;
 import com.monkey.springboot.demo.annotation.AesSecurityParameter;
 import com.monkey.springboot.demo.annotation.MyLog;
 import com.monkey.springboot.demo.annotation.RsaSecurityParameter;
 import com.monkey.springboot.demo.annotation.SecurityParameter;
 import com.monkey.springboot.demo.domain.Persion;
-import com.monkey.springboot.demo.utils.BadWordUtil;
-import com.monkey.springboot.demo.utils.SendEmailUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.*;
 
 /**
  * 〈一句话功能简述〉<br>
@@ -51,34 +52,52 @@ public class TestController {
     public Object getRsa() {
         return "rsa";
     }
+
     // 跳转aes页面
     @GetMapping("/aes")
     public Object getAes() {
-return "aes";
+        return "aes";
     }
+
     // 跳转rsa+aes页面
     @RequestMapping("/rsaAes")
     public Object getRsaAes() {
         return "rsaAes";
     }
+
     // 跳转summary页面
     @RequestMapping("/summary")
     public Object getSummary() {
         return "summary";
     }
+
     // 跳转recaptchaV2页面
     @RequestMapping("/recaptchaV2")
     public Object getRecaptchaV2() {
         return "recaptchaV2";
     }
+
     // 跳转recaptchaV3页面
     @RequestMapping("/recaptchaV3")
     public Object getRecaptchaV3() {
         return "recaptchaV3";
     }
 
+    // 跳转TXT页面
+    @RequestMapping("/txt")
+    public Object getTxt() {
+        return "txt";
+    }
+
+    // 跳转excel页面
+    @RequestMapping("/excel")
+    public Object getExcel() {
+        return "excel";
+    }
+
     /**
      * AES加密测试
+     *
      * @return object
      */
     @RequestMapping("/testAesEncrypt")
@@ -90,6 +109,7 @@ return "aes";
 
     /**
      * RSA加密测试
+     *
      * @return object
      */
     @RequestMapping("/testRsaEncrypt")
@@ -98,8 +118,10 @@ return "aes";
     public Persion testRsaEncrypt(@RequestBody Persion info) {
         return info;
     }
+
     /**
      * RSA+AES双重加密测试
+     *
      * @return object
      */
     @RequestMapping("/testEncrypt")
@@ -111,6 +133,7 @@ return "aes";
 
     /**
      * 综合测试
+     *
      * @param persion
      * @return
      */
@@ -177,15 +200,16 @@ return "aes";
         String json = HttpRequest.sendPost("https://www.recaptcha.net/recaptcha/api/siteverify", map, "UTF-8");
         return json;
     }
+
     @MyLog(value = "敏感词验证记录")
     @RequestMapping("/checkStr")
     @ResponseBody
     public String checkStr(String str) {
-        System.out.println("替换敏感词: "+BadWordUtil.replaceBadWord(str, 2, "*"));
-        System.out.println("是否包含敏感词: "+BadWordUtil.isContaintBadWord(str, 2));
+        System.out.println("替换敏感词: " + BadWordUtil.replaceBadWord(str, 2, "*"));
+        System.out.println("是否包含敏感词: " + BadWordUtil.isContaintBadWord(str, 2));
         Set<String> set = BadWordUtil.getBadWord(str, 2);
-        System.out.println("敏感词汇个数: "+set.size());
-        System.out.println("敏感词汇: "+BadWordUtil.getBadWord(str, 2));
+        System.out.println("敏感词汇个数: " + set.size());
+        System.out.println("敏感词汇: " + BadWordUtil.getBadWord(str, 2));
         return str;
     }
 
@@ -194,5 +218,54 @@ return "aes";
     @ResponseBody
     public void sendEmail(String email) throws Exception {
         sendEmailUtils.send(email);
+    }
+
+    @MyLog(value = "导出TXT文件")
+    @PostMapping(value = "/exportTxt")
+    public void exportTxt(@RequestParam("file") MultipartFile file, HttpServletResponse response) {
+        try {
+            InputStream inputStream = file.getInputStream();
+            /* 读入TXT文件 */
+            InputStreamReader reader = new InputStreamReader(
+                    inputStream, "GBK"); // 建立一个输入流对象reader
+            BufferedReader br = new BufferedReader(reader); // 建立一个对象，它把文件内容转成计算机能读懂的语言
+            StringBuffer stringBuffer = new StringBuffer();
+            String line = "";
+            boolean flag = true;
+            while (flag) {
+                line = br.readLine(); // 一次读入一行数据
+                if (StringUtils.isEmpty(line)) {
+                    flag = false;
+                } else {
+                    stringBuffer.append(line + "\r\n");
+                }
+            }
+            //导出
+            ExportTextUtil.writeToTxt(response, stringBuffer.toString(), "XXX");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @MyLog(value = "导出数据量大的Excel文件")
+    @PostMapping(value = "/exportExcel")
+    public void exportExcel(@RequestParam("file") MultipartFile file, HttpServletResponse response) {
+        try {
+            List<Persion> list = new ArrayList<>();
+            for (int i = 0; i < 10000; i++) {
+                Persion persion = new Persion();
+                persion.setName("Monkey");
+                persion.setPassword("111111");
+                persion.setCode("11111");
+                list.add(persion);
+            }
+            /**
+             * 导出
+             */
+            String[] columnNames = { "ID", "姓名", "性别" };
+            ExportExcelUtil.outPutToBigExcel(list,"人",columnNames, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

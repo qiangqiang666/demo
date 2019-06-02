@@ -2,7 +2,6 @@ package com.monkey.springboot.demo.advice;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.monkey.springboot.demo.HttpRequest;
 import com.monkey.springboot.demo.annotation.AesSecurityParameter;
 import com.monkey.springboot.demo.annotation.RsaSecurityParameter;
 import com.monkey.springboot.demo.annotation.SecurityParameter;
