@@ -1,5 +1,6 @@
 package com.monkey.springboot.demo.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -12,6 +13,7 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 描述:
@@ -22,7 +24,7 @@ import java.util.List;
  */
 public class ExportExcelUtil {
 
-    public static void outPutToBigExcel(List list, String reportName,String[] columnNames ,HttpServletResponse response) {
+    public static void outPutToBigExcel(List list, String reportName, Map<String,String> columnNames , HttpServletResponse response) {
         if (null != list && list.size() > 0) {
             long startTime = System.currentTimeMillis();
             String fileName = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + ".xlsx";
@@ -44,9 +46,11 @@ public class ExportExcelUtil {
 
                         //定义表头
                         nRow = sheet.createRow(0);
-                        for (int i = 0; i < columnNames.length; i++) {
+                        int i = 0;
+                        for (String key:columnNames.keySet()) {
                             Cell cel0 = nRow.createCell(i);
-                            cel0.setCellValue(columnNames[i]);
+                            cel0.setCellValue(columnNames.get(key));
+                            i++;
                         }
                     }
                     rowNo++;
@@ -61,10 +65,15 @@ public class ExportExcelUtil {
                         Field field = fields[i];
                         //打开私有访问
                         field.setAccessible(true);
-                        //获取属性值
-                        Object value = field.get(obj);
-                        Cell cel0 = nRow.createCell(i);
-                        cel0.setCellValue(value.toString());
+                        //获取属性名
+                        String name = field.getName();
+                        String mapValue = columnNames.get(name);
+                        if (StringUtils.isNotEmpty(mapValue)){
+                            //获取属性值
+                            Object value = field.get(obj);
+                            Cell cel0 = nRow.createCell(i);
+                            cel0.setCellValue(value.toString());
+                        }
                     }
                 }
             } catch (Exception e) {

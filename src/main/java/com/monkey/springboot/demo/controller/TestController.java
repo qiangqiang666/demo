@@ -262,8 +262,10 @@ public class TestController {
             /**
              * 导出
              */
-            String[] columnNames = { "ID", "姓名", "性别" };
-            ExportExcelUtil.outPutToBigExcel(list,"人",columnNames, response);
+            Map<String,String> map = new HashMap<>();
+            map.put("name", "姓名");
+            map.put("password", "密码");
+            ExportExcelUtil.outPutToBigExcel(list,"人",map, response);
         } catch (Exception e) {
             e.printStackTrace();
         }
