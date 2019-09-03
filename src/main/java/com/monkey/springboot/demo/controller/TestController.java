@@ -10,8 +10,10 @@
  */
 package com.monkey.springboot.demo.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.monkey.springboot.demo.service.IPLocationService;
 import com.monkey.springboot.demo.utils.*;
 import com.monkey.springboot.demo.annotation.AesSecurityParameter;
 import com.monkey.springboot.demo.annotation.MyLog;
@@ -46,6 +48,8 @@ public class TestController {
 
     @Autowired
     private SendEmailUtils sendEmailUtils;
+    @Autowired
+    private IPLocationService ipLocationService;
 
     // 跳转rsa页面
     @GetMapping("/rsa")
@@ -93,6 +97,12 @@ public class TestController {
     @RequestMapping("/excel")
     public Object getExcel() {
         return "excel";
+    }
+
+    // 跳转location页面
+    @RequestMapping("/location")
+    public Object getLocation() {
+        return "location";
     }
 
     /**
@@ -269,5 +279,12 @@ public class TestController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    @MyLog(value = "查询IP地址")
+    @RequestMapping(value = "/selectLocation", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public String selectLocation(String ip) {
+        String s = ipLocationService.selectIpLocation(ip);
+        return JSON.toJSONString(s);
     }
 }

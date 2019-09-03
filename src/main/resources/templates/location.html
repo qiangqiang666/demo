@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>查询IP地址</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<div class="col-sm-1">
+    <h1>查询</h1>
+    <input type="test" id="ip" />
+    <button onclick="selectLocation()">查询</button>
+    <h1 id="post_site"></h1>
+</div>
+</body>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    ctxPath = /*[[@{/}]]*/ '';
+    /*]]>*/
+
+
+
+    console.info(ctxPath);
+</script>
+<script>
+    function selectLocation() {
+        $("#post_site").text("");
+        $.get("/selectLocation",{ip:$("#ip").val()},function(result){
+            //alert(result);
+            $("#post_site").text(result);
+        });
+    }
+</script>
+</html>
