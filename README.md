@@ -9,6 +9,7 @@
 7.邮箱:发送邮件(一般用于验证码验证或者链接验证)<br>
 8.导出:上传文件,导出TXT文件<br>
 9.导出: 导出大量数据的excel(超速)<br>
+10.查询IP地址: 自动切换查询源,目前已经有5个左右查询源!!!<br>
 ## 运行后访问以下链接,然后debug就可以查看如何实现以下功能 ##
 1.(aes加解密双向)http://localhost:8080/aes<br>
 2.(rsa加解密双向)http://localhost:8080/rsa<br>
@@ -21,3 +22,4 @@
 9.(发送邮件)http://localhost:8080/sendEmail?email=446372479@qq.com<br>
 10.(导出TXT)http://localhost:8080/txt<br>
 11.(导出大量数据的excel(超速))http://localhost:8080/excel<br>
+12.(查询IP地址)http://localhost:8080/location<br>
