@@ -120,11 +120,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
-        <!-- 加解密 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-encrypt</artifactId>
-        </dependency>
         <!-- swagger -->
         <dependency>
             <groupId>io.springfox</groupId>
