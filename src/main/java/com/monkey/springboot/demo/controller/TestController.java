@@ -11,6 +11,7 @@
 package com.monkey.springboot.demo.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.monkey.springboot.demo.service.IPLocationService;
@@ -272,7 +273,7 @@ public class TestController {
             /**
              * 导出
              */
-            Map<String,String> map = new HashMap<>();
+            LinkedHashMap<String,String> map = Maps.newLinkedHashMap();
             map.put("name", "姓名");
             map.put("password", "密码");
             ExportExcelUtil.outPutToBigExcel(list,"人",map, response);
