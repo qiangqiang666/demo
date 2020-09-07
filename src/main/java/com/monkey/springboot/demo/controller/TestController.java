@@ -11,9 +11,11 @@
 package com.monkey.springboot.demo.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.monkey.springboot.demo.google.GoogleAuthenticator;
 import com.monkey.springboot.demo.service.IPLocationService;
 import com.monkey.springboot.demo.utils.*;
 import com.monkey.springboot.demo.annotation.AesSecurityParameter;
@@ -287,5 +289,39 @@ public class TestController {
     public String selectLocation(String ip) {
         String s = ipLocationService.selectIpLocation(ip);
         return JSON.toJSONString(s);
+    }
+
+    /**
+     * 生成谷歌私钥和路由
+     * @return
+     */
+    @RequestMapping(value = "/createCode", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public String createCode() {
+        // 生成谷歌验证私钥, ps: 一般业务都是存放在用户表中,一位用户一个私钥,定期重置私钥
+        String privateKey = GoogleAuthenticator.genSecret();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("privateKey", privateKey);
+        return JSON.toJSONString(jsonObject);
+    }
+
+    /**
+     * 校验验证码
+     * @param codes 手机app <Google Authenticator> 中的6位数字
+     * @param privateKey  GoogleAuthenticator.genSecret()生成的私钥
+     * @return
+     */
+    @RequestMapping(value = "/checkCode", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public String checkCode(String codes,String privateKey) {
+        Boolean authcode = GoogleAuthenticator.authcode(codes, privateKey);
+        return JSON.toJSONString(authcode);
+    }
+
+    public static void main(String[] args) {
+//        String privateKey = GoogleAuthenticator.genSecret();
+//        System.out.println(privateKey);
+        Boolean authcode = GoogleAuthenticator.authcode("445653", "ZEVA243P4NDTNNDP");
+        System.out.println(authcode);
     }
 }
